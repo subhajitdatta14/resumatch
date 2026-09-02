@@ -62,7 +62,7 @@ async function extractTextFromBuffer(buffer: Buffer, originalName = "", mimetype
       try {
         const base64Data = buffer.toString("base64");
         const response = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
+          model: "gemini-3.7-flash",
           contents: [
             {
               inlineData: {
@@ -99,7 +99,7 @@ app.post("/api/evaluate", async (req, res) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.7-flash",
       contents: `Evaluate this candidate for the role of ${roleName || "Unspecified Role"}. 
       
       Candidate Name: ${name || "Unknown Candidate"}
