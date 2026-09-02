@@ -62,7 +62,7 @@ async function extractTextFromBuffer(buffer: Buffer, originalName = "", mimetype
       try {
         const base64Data = buffer.toString("base64");
         const response = await ai.models.generateContent({
-          model: "gemini-3.7-flash",
+          model: "gemini-3.5-flash",
           contents: [
             {
               inlineData: {
