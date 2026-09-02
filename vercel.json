@@ -1,15 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/api/evaluate",
-      "destination": "/api/evaluate"
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
-      "source": "/api/parse-resume",
-      "destination": "/api/parse-resume"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]
