@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/evaluate",
+      "destination": "/api/evaluate"
+    },
+    {
+      "source": "/api/parse-resume",
+      "destination": "/api/parse-resume"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
