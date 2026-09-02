@@ -48,7 +48,7 @@ Provide an objective, calibrated evaluation return JSON matching the schema with
 - overallFeedback: a concise 1-2 sentence executive summary`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.7-flash",
+      model: "gemini-3.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
