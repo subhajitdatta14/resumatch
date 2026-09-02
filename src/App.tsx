@@ -470,12 +470,18 @@ SUMMARY:
     const selectedRole = ROLES.find(r => r.id === formData.role);
     const requirements = formData.customRequirements || selectedRole?.requirements;
 
+    // Set a 35-second client timeout to prevent hanging indefinitely
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 35000);
+
     try {
+      console.log("Submitting resume for evaluation...");
       const response = await fetch("/api/evaluate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        signal: controller.signal,
         body: JSON.stringify({
           name: formData.name,
           resumeText: formData.resumeText,
@@ -483,6 +489,8 @@ SUMMARY:
           requirements: requirements,
         }),
       });
+
+      clearTimeout(timeoutId);
 
       const contentType = response.headers.get("content-type") || "";
       let aiData: AIResult;
@@ -501,22 +509,31 @@ SUMMARY:
       setResult(aiData);
 
       // Save to Supabase
-      const { error } = await supabase.from("evaluations").insert({
-        user_id: session.user.id,
-        candidate_name: formData.name || "Unknown Candidate",
-        resume_text: formData.resumeText,
-        role: selectedRole?.name,
-        score: aiData.matchScore,
-        feedback: aiData
-      });
+      try {
+        const { error } = await supabase.from("evaluations").insert({
+          user_id: session.user.id,
+          candidate_name: formData.name || "Unknown Candidate",
+          resume_text: formData.resumeText,
+          role: selectedRole?.name,
+          score: aiData.matchScore,
+          feedback: aiData
+        });
 
-      if (error) console.error("Save failed:", error);
+        if (error) console.error("Save to Supabase failed:", error);
+      } catch (dbErr) {
+        console.warn("Non-fatal Supabase sync note:", dbErr);
+      }
 
       fetchHistory(session.user.id);
       setView("result");
     } catch (error: any) {
+      clearTimeout(timeoutId);
       console.error("Evaluation failed:", error);
-      alert(error.message || "Evaluation failed. Please try again.");
+      if (error.name === "AbortError") {
+        alert("The request took longer than expected. Please verify your GEMINI_API_KEY in your hosting dashboard and try again.");
+      } else {
+        alert(error.message || "Evaluation failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
